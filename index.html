@@ -66,7 +66,7 @@
             flex: 1;
             text-align: left;
             min-width: 150px;
-            margin-right: 10px; /* Espacio entre el label y el input */
+            margin-right: 10px;
         }
         .row input, .row select {
             flex: 2;
@@ -117,14 +117,14 @@
                 padding: 10px;
             }
             .row {
-                flex-direction: row; /* Mantener el formato izquierda-derecha */
+                flex-direction: row;
             }
             .row label, .row input, .row select {
                 flex: 1;
-                min-width: auto; /* Ajustar el ancho automáticamente */
+                min-width: auto;
             }
             .row label {
-                margin-right: 10px; /* Mantener el espacio entre label e input */
+                margin-right: 10px;
             }
             .button {
                 font-size: 14px;
@@ -193,8 +193,7 @@
 
         <div class="row">
             <label>Fecha de la colocación del equipo</label>
-            <input type="date" id="fechaColocacion" value="Selecionar Fecha">
-            
+            <input type="date" id="fechaColocacion">
         </div>
 
         <div class="row">
@@ -247,6 +246,16 @@
     </div>
 
     <script>
+        // Función para establecer la fecha actual en el campo de fecha
+        function establecerFechaActual() {
+            const fechaInput = document.getElementById("fechaColocacion");
+            const fechaActual = new Date().toISOString().split("T")[0]; // Formato YYYY-MM-DD
+            fechaInput.value = fechaActual;
+        }
+
+        // Llamar a la función al cargar la página
+        window.onload = establecerFechaActual;
+
         // Configuración de la API de Google Sheets
         const SHEET_ID = '1k7gBdZwyHrZ0AJYSudI_lvE702qoYu-1D-tRlCmI5Ws'; // Reemplaza con tu ID
         const API_KEY = 'AIzaSyAgm2abFGywtXF3ZXxOEVsiJQZu9DO7_hI'; // Reemplaza con tu clave de API
