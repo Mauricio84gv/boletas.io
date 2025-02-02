@@ -10,6 +10,8 @@
             font-family: Arial, sans-serif;
             background-color: white;
             text-align: center;
+            margin: 0;
+            padding: 0;
         }
         .container {
             max-width: 600px;
@@ -17,6 +19,7 @@
             padding: 20px;
             border: 2px solid black;
             background-color: white;
+            box-sizing: border-box;
         }
         h2 {
             background-color: red;
@@ -26,6 +29,7 @@
             font-weight: bold;
             text-transform: uppercase;
             text-align: center;
+            margin: -20px -20px 20px -20px;
         }
         label {
             font-weight: bold;
@@ -42,6 +46,7 @@
             font-size: 16px;
             font-weight: bold;
             background-color: white;
+            box-sizing: border-box;
         }
         .highlight {
             background-color: red;
@@ -52,15 +57,20 @@
         }
         .row {
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
+            margin-bottom: 10px;
         }
         .row label {
             flex: 1;
             text-align: left;
+            min-width: 150px;
+            margin-right: 10px; /* Espacio entre el label y el input */
         }
         .row input, .row select {
             flex: 2;
+            min-width: 200px;
         }
         .button {
             background-color: green;
@@ -71,6 +81,8 @@
             font-weight: bold;
             cursor: pointer;
             margin-top: 20px;
+            width: 100%;
+            box-sizing: border-box;
         }
         .button:hover {
             background-color: darkgreen;
@@ -84,6 +96,7 @@
             overflow-y: auto;
             width: calc(100% - 24px);
             z-index: 1;
+            box-sizing: border-box;
         }
         .suggestions div {
             padding: 10px;
@@ -92,6 +105,43 @@
         }
         .suggestions div:hover {
             background-color: #f1f1f1;
+        }
+
+        /* Media Queries para hacer el diseño responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            h2 {
+                font-size: 18px;
+                padding: 10px;
+            }
+            .row label, .row input, .row select {
+                flex: 1 1 100%;
+                min-width: 100%;
+            }
+            .row label {
+                margin-right: 0; /* Eliminar el margen en pantallas pequeñas */
+            }
+            .button {
+                font-size: 14px;
+                padding: 10px 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h2 {
+                font-size: 16px;
+                padding: 8px;
+            }
+            input, select {
+                font-size: 14px;
+                padding: 8px;
+            }
+            .button {
+                font-size: 12px;
+                padding: 8px 12px;
+            }
         }
     </style>
     <!-- Incluir la librería html2pdf.js -->
