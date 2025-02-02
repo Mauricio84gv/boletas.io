@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Consumo de Equipos</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 2px solid black;
+            background-color: white;
+        }
+        h2 {
+            background-color: red;
+            color: white;
+            padding: 15px;
+            font-size: 22px;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+            text-align: left;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 2px solid black;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: white;
+        }
+        .highlight {
+            background-color: red;
+            color: white;
+            font-weight: bold;
+            border: 2px solid black;
+            text-align: center;
+        }
+        .row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .row label {
+            flex: 1;
+            text-align: left;
+        }
+        .row input, .row select {
+            flex: 2;
+        }
+        .button {
+            background-color: green;
+            color: white;
+            padding: 15px 20px;
+            border: 2px solid black;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .button:hover {
+            background-color: darkgreen;
+        }
+        .suggestions {
+            display: none;
+            position: absolute;
+            background-color: white;
+            border: 2px solid black;
+            max-height: 150px;
+            overflow-y: auto;
+            width: calc(100% - 24px);
+            z-index: 1;
+        }
+        .suggestions div {
+            padding: 10px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .suggestions div:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
+    <!-- Incluir la librería html2pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <div class="container" id="formulario">
+        <h2>CONSUMO DE EQUIPOS EN SITIOS CLARO</h2>
+        <div class="row">
+            <label>Nombre del Técnico encargado</label>
+            <select id="nombreTecnico">
+                <option value="CARLOS MAURICIO GONZALEZ VILLEGAS">CARLOS MAURICIO GONZALEZ VILLEGAS</option>
+                <option value="ALEXANDER VELAZQUEZ TELLEZ">ALEXANDER VELAZQUEZ TELLEZ</option>
+                <option value="CARLOS ALONSO ARGUELLO SALAS">CARLOS ALONSO ARGUELLO SALAS</option>
+                <option value="DAVID NAVARRO HERRERA">DAVID NAVARRO HERRERA</option>
+                <option value="JOSE DAVID BERMUDEZ FALLAS">JOSE DAVID BERMUDEZ FALLAS</option>
+                <option value="LUIS DIEGO RAMIREZ SOLANO">LUIS DIEGO RAMIREZ SOLANO</option>
+                <option value="FREDDY CHENG NG">FREDDY CHENG NG</option>
+                <option value="BRAULIO CERDAS SALAZAR">BRAULIO CERDAS SALAZAR</option>
+                <option value="BRAIAN ALEXANDER ZAMBRANO RAMIREZ">BRAIAN ALEXANDER ZAMBRANO RAMIREZ</option>
+                <option value="JONATHAN JOSE CHAVES QUIROS">JONATHAN JOSE CHAVES QUIROS</option>
+                <option value="JEFRY ROSALES VILLAREAL">JEFRY ROSALES VILLAREAL</option>
+                <option value="JOSE GREGORIO MELENDEZ LONGA">JOSE GREGORIO MELENDEZ LONGA</option>
+                <option value="LUIS PABLO ARTEAGA GOMEZ">LUIS PABLO ARTEAGA GOMEZ</option>
+                <option value="BRAYNER DAVID VEGA QUESADA">BRAYNER DAVID VEGA QUESADA</option>
+                <option value="KEVIN DANIEL ARIAS GALLARDO">KEVIN DANIEL ARIAS GALLARDO</option>
+                <option value="JOHNNY MAURICIO RODRIGUEZ SEQUEIRA">JOHNNY MAURICIO RODRIGUEZ SEQUEIRA</option>
+                <option value="JORGE ALFONSO CHAVARRIA PICADO">JORGE ALFONSO CHAVARRIA PICADO</option>
+                <option value="MANUEL VALLADARES MEJIA">MANUEL VALLADARES MEJIA</option>
+                <option value="ANGEL ALFREDO VALLECILLO CRUZ">ANGEL ALFREDO VALLECILLO CRUZ</option>
+                <option value="DAYBIS ALEXANDER MENBREÑO BUSTOS">DAYBIS ALEXANDER MENBREÑO BUSTOS</option>
+                <option value="JORAM JESUS MATARRITA ARAYA">JORAM JESUS MATARRITA ARAYA</option>
+                <option value="JUAN CARLOS VILLALOBOS BUSTOS">JUAN CARLOS VILLALOBOS BUSTOS</option>
+                <option value="JORGE ALEJANDRO VEGA MORA">JORGE ALEJANDRO VEGA MORA</option>
+                <option value="LUIS ALEJANDRO CASCANTE SANDI">LUIS ALEJANDRO CASCANTE SANDI</option>
+                <option value="FABIAN GONZALEZ VALLE">FABIAN GONZALEZ VALLE</option>
+                <option value="WILBERT YADIAN RODRIGUEZ UMAÑA">WILBERT YADIAN RODRIGUEZ UMAÑA</option>
+                <option value="BISMARK ORLANDO BRAVO RAMIREZ">BISMARK ORLANDO BRAVO RAMIREZ</option>
+                <option value="JOSE ARTURO VINDAS CASTILLO">JOSE ARTURO VINDAS CASTILLO</option>
+                <option value="NORBERTO ALONSO MOLINA ROJAS">NORBERTO ALONSO MOLINA ROJAS</option>
+                <option value="WAGNER ALBERTO SANDI ROMERO">WAGNER ALBERTO SANDI ROMERO</option>
+                <option value="JEFFRY MARCIAL VILLEGAS LOPEZ">JEFFRY MARCIAL VILLEGAS LOPEZ</option>
+                <option value="GILBERT MAURICIO JIMENEZ PRENDAS">GILBERT MAURICIO JIMENEZ PRENDAS</option>
+            </select>
+        </div>
+
+        <div class="row">
+            <label>Fecha de la colocación del equipo</label>
+            <input type="date" id="fechaColocacion" value="2025-01-30">
+        </div>
+
+        <div class="row">
+            <label>Zona de asignación técnica</label>
+            <select id="zonaAsignacion" class="highlight">
+                <option value="Alajuela">Alajuela</option>
+                <option value="Heredia">Heredia</option>
+                <option value="Cartago">Cartago</option>
+                <option value="Este">Este</option>
+                <option value="Golfo">Golfo</option>
+                <option value="Liberia">Liberia</option>
+                <option value="Limon">Limon</option>
+                <option value="Oeste">Oeste</option>
+                <option value="Pacifico">Pacifico</option>
+                <option value="San Carlos">San Carlos</option>
+                <option value="Sur">Sur</option>
+            </select>
+        </div>
+
+        <div class="row">
+            <label>Sitio</label>
+            <input type="text" id="sitio" value="RUR193">
+        </div>
+
+        <div class="row">
+            <label>Ticket ETA</label>
+            <input type="text" id="ticketETA" value="T1588518">
+        </div>
+
+        <div class="row">
+            <label>Nombre del equipo colocado</label>
+            <input type="text" id="nombreEquipo" class="highlight" value="Radio 4499 B1 B3">
+        </div>
+
+        <div class="row">
+            <label>Cantidad de equipos asignados al sitio</label>
+            <input type="text" id="cantidadEquipos" value="1">
+        </div>
+
+        <div class="row">
+            <label>Código de descripción del equipo</label>
+            <input type="text" id="codigoEquipo" placeholder="Escribe para buscar..." autocomplete="off">
+            <div id="suggestions" class="suggestions"></div>
+        </div>
+    </div>
+
+    <!-- Botón para generar y compartir el PDF -->
+    <div style="text-align: center; margin-top: 20px;">
+        <button class="button" onclick="generarPDF()">GENERAR Y COMPARTIR PDF</button>
+    </div>
+
+    <script>
+        // Configuración de la API de Google Sheets
+        const SHEET_ID = '1k7gBdZwyHrZ0AJYSudI_lvE702qoYu-1D-tRlCmI5Ws'; // Reemplaza con tu ID
+        const API_KEY = 'AIzaSyAgm2abFGywtXF3ZXxOEVsiJQZu9DO7_hI'; // Reemplaza con tu clave de API
+        const RANGO = 'Equipos!A2:B'; // Ajusta el rango según tu hoja
+
+        // Obtener elementos del DOM
+        const codigoEquipo = document.getElementById("codigoEquipo");
+        const nombreEquipo = document.getElementById("nombreEquipo");
+        const suggestions = document.getElementById("suggestions");
+
+        // Función para obtener datos de Google Sheets
+        async function obtenerDatosDeSheets() {
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGO}?key=${API_KEY}`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                return data.values || [];
+            } catch (error) {
+                console.error("Error al obtener datos de Google Sheets:", error);
+                return [];
+            }
+        }
+
+        // Función para mostrar sugerencias
+        async function mostrarSugerencias(valor) {
+            suggestions.innerHTML = ""; // Limpiar sugerencias anteriores
+            if (valor.length > 0) {
+                const datos = await obtenerDatosDeSheets();
+                const filtrados = datos.filter(([codigo]) => codigo.toUpperCase().includes(valor.toUpperCase()));
+                filtrados.forEach(([codigo, descripcion]) => {
+                    const div = document.createElement("div");
+                    div.textContent = codigo;
+                    div.onclick = () => {
+                        codigoEquipo.value = codigo;
+                        nombreEquipo.value = descripcion || "";
+                        suggestions.style.display = "none";
+                    };
+                    suggestions.appendChild(div);
+                });
+                suggestions.style.display = "block";
+            } else {
+                suggestions.style.display = "none";
+            }
+        }
+
+        // Evento para filtrar códigos mientras se escribe
+        codigoEquipo.addEventListener("input", function () {
+            mostrarSugerencias(this.value);
+        });
+
+        // Evento para ocultar sugerencias al hacer clic fuera
+        document.addEventListener("click", function (event) {
+            if (event.target !== codigoEquipo) {
+                suggestions.style.display = "none";
+            }
+        });
+
+        // Función para generar y compartir el PDF
+        function generarPDF() {
+            // Obtener el valor del campo "Sitio"
+            const sitio = document.getElementById("sitio").value;
+
+            // Crear el nombre del archivo PDF
+            const nombreArchivo = `Registro para consumo de equipos - ${sitio}.pdf`;
+
+            // Ocultar el botón antes de generar el PDF
+            const boton = document.querySelector('.button');
+            boton.style.display = 'none';
+
+            // Configuración de html2pdf
+            const elemento = document.getElementById('formulario');
+            const opciones = {
+                margin: 10,
+                filename: nombreArchivo, // Nombre personalizado del archivo
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Generar el PDF
+            html2pdf().from(elemento).set(opciones).save().then(() => {
+                // Mostrar el botón nuevamente después de generar el PDF
+                boton.style.display = 'inline-block';
+            });
+        }
+    </script>
+    <script src="cordova.js"></script>
+    <script src="js/index.js"></script>
+</body>
+</html>
