@@ -76,6 +76,13 @@
         .resultados div:hover {
             background-color: #f1f1f1;
         }
+        .codigo {
+            font-weight: bold;
+            color: red;
+        }
+        .descripcion {
+            color: black;
+        }
     </style>
 </head>
 <body>
@@ -105,6 +112,7 @@
             try {
                 const response = await fetch(url);
                 const data = await response.json();
+                console.log("Datos obtenidos de Google Sheets:", data); // Depuración
                 return data.values || [];
             } catch (error) {
                 console.error("Error al obtener datos de Google Sheets:", error);
@@ -119,14 +127,20 @@
 
             if (valor.length > 0) {
                 const datos = await obtenerDatosDeSheets();
+                console.log("Datos filtrados:", datos); // Depuración
+
                 const filtrados = datos.filter(([codigo, descripcion]) => 
-                    descripcion.toUpperCase().includes(valor)
+                    descripcion && descripcion.toUpperCase().includes(valor)
                 );
 
                 if (filtrados.length > 0) {
                     filtrados.forEach(([codigo, descripcion]) => {
                         const div = document.createElement("div");
-                        div.textContent = `${codigo} - ${descripcion}`;
+                        // Separar código y descripción
+                        div.innerHTML = `
+                            <span class="codigo">${codigo}</span> - 
+                            <span class="descripcion">${descripcion}</span>
+                        `;
                         div.onclick = () => {
                             buscarDescripcion.value = descripcion; // Llenar el campo con la descripción seleccionada
                             resultados.innerHTML = ""; // Limpiar la lista de resultados
