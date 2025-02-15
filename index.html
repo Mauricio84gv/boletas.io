@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lector de Códigos de Barras y QR</title>
-    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    <title>Buscar Código por Descripción</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -16,19 +15,7 @@
         h1 {
             color: #333;
         }
-        #qr-reader {
-            width: 100%;
-            max-width: 500px;
-            margin: 20px auto;
-            display: none;
-        }
-        #descripcion {
-            font-size: 18px;
-            font-weight: bold;
-            color: #333;
-            margin-top: 20px;
-        }
-        #activar-camara {
+        #buscar-descripcion {
             padding: 10px 20px;
             font-size: 16px;
             background-color: #007bff;
@@ -37,54 +24,61 @@
             border-radius: 5px;
             cursor: pointer;
         }
+        #descripcion-input {
+            padding: 10px;
+            font-size: 16px;
+            width: 300px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #resultado {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
-    <h1>Escáner de Códigos</h1>
-    <button id="activar-camara">Activar Cámara</button>
-    <div id="qr-reader"></div>
-    <div id="descripcion">Escanea un código para ver la descripción aquí.</div>
+    <h1>Buscar Código por Descripción</h1>
+    <input type="text" id="descripcion-input" placeholder="Ingresa la descripción">
+    <button id="buscar-descripcion">Buscar</button>
+    <div id="resultado">El código aparecerá aquí.</div>
 
     <script>
-        let html5QrCode;
+        const SHEET_ID = '1k7gBdZwyHrZ0AJYSudI_lvE702qoYu-1D-tRlCmI5Ws'; // Reemplaza con tu ID de hoja
+        const API_KEY = 'AIzaSyAgm2abFGywtXF3ZXxOEVsiJQZu9DO7_hI'; // Reemplaza con tu clave de API
+        const RANGO = 'Equipos!A2:B'; // Ajusta el rango según tu hoja
 
-        function onScanSuccess(qrMessage) {
-            document.getElementById('descripcion').textContent = `Código escaneado: ${qrMessage}`;
-        }
-
-        function onScanError(error) {
-            console.warn(`Error de escaneo: ${error}`);
-        }
-
-        document.getElementById('activar-camara').addEventListener('click', async () => {
+        async function obtenerDatosDeSheets() {
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGO}?key=${API_KEY}`;
             try {
-                // Verificar permisos
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-                
-                // Mostrar el escáner
-                document.getElementById('qr-reader').style.display = 'block';
-
-                // Iniciar el escaneo
-                html5QrCode = new Html5Qrcode("qr-reader");
-                await html5QrCode.start(
-                    { facingMode: "environment" },
-                    {
-                        fps: 10,
-                        qrbox: { width: 250, height: 250 },
-                    },
-                    onScanSuccess,
-                    onScanError
-                );
+                const response = await fetch(url);
+                const data = await response.json();
+                return data.values || [];
             } catch (error) {
-                console.error("Error al acceder a la cámara:", error);
-                if (error.name === "NotAllowedError") {
-                    document.getElementById('descripcion').textContent = "Error: Permisos de cámara denegados. Por favor, permite el acceso a la cámara.";
-                } else if (error.name === "NotFoundError") {
-                    document.getElementById('descripcion').textContent = "Error: No se encontró ninguna cámara.";
-                } else {
-                    document.getElementById('descripcion').textContent = "Error: No se pudo acceder a la cámara. Asegúrate de que la cámara esté disponible y los permisos estén otorgados.";
-                }
+                console.error("Error al obtener datos de Google Sheets:", error);
+                return [];
             }
+        }
+
+        async function buscarCodigoPorDescripcion(descripcion) {
+            const datos = await obtenerDatosDeSheets();
+            const resultado = datos.find(([, descripcionHoja]) => descripcionHoja.toLowerCase() === descripcion.toLowerCase());
+            return resultado ? resultado[0] : "Código no encontrado";
+        }
+
+        document.getElementById('buscar-descripcion').addEventListener('click', async () => {
+            const descripcion = document.getElementById('descripcion-input').value.trim();
+            if (!descripcion) {
+                document.getElementById('resultado').textContent = "Por favor, ingresa una descripción.";
+                return;
+            }
+
+            document.getElementById('resultado').textContent = "Buscando...";
+            const codigo = await buscarCodigoPorDescripcion(descripcion);
+            document.getElementById('resultado').textContent = `Código: ${codigo}`;
         });
     </script>
 </body>
