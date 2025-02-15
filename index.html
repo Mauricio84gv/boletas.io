@@ -1,272 +1,57 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Consumo de Equipos</title>
-    <link rel="stylesheet" href="css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lector de Códigos de Barras y QR</title>
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: white;
             text-align: center;
+            background-color: #f0f0f5;
             margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 600px;
-            margin: auto;
             padding: 20px;
-            border: 2px solid black;
-            background-color: white;
-            box-sizing: border-box;
         }
-        h2 {
-            background-color: red;
-            color: white;
-            padding: 15px;
-            font-size: 22px;
-            font-weight: bold;
-            text-transform: uppercase;
-            text-align: center;
-            margin: -20px -20px 20px -20px;
+        h1 {
+            color: #333;
         }
-        label {
-            font-weight: bold;
-            display: block;
-            margin-top: 10px;
-            text-align: left;
-        }
-        input, select {
+        #qr-reader {
             width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-            border: 2px solid black;
-            text-align: center;
-            font-size: 16px;
-            font-weight: bold;
-            background-color: white;
-            box-sizing: border-box;
-        }
-        .highlight {
-            background-color: red;
-            color: white;
-            font-weight: bold;
-            border: 2px solid black;
-            text-align: center;
-        }
-        .row {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        .row label {
-            flex: 1;
-            text-align: left;
-            min-width: 150px;
-            margin-right: 10px;
-        }
-        .row input, .row select {
-            flex: 2;
-            min-width: 200px;
-        }
-        .button {
-            background-color: green;
-            color: white;
-            padding: 15px 20px;
-            border: 2px solid black;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .button:hover {
-            background-color: darkgreen;
-        }
-        .suggestions {
+            max-width: 500px;
+            margin: 20px auto;
             display: none;
-            position: absolute;
-            background-color: white;
-            border: 2px solid black;
-            max-height: 150px;
-            overflow-y: auto;
-            width: calc(100% - 24px);
-            z-index: 1;
-            box-sizing: border-box;
         }
-        .suggestions div {
-            padding: 10px;
+        #descripcion {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 20px;
+        }
+        #activar-camara {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
-            text-align: center;
-        }
-        .suggestions div:hover {
-            background-color: #f1f1f1;
-        }
-
-        /* Media Queries para hacer el diseño responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            h2 {
-                font-size: 18px;
-                padding: 10px;
-            }
-            .row {
-                flex-direction: row;
-            }
-            .row label, .row input, .row select {
-                flex: 1;
-                min-width: auto;
-            }
-            .row label {
-                margin-right: 10px;
-            }
-            .button {
-                font-size: 14px;
-                padding: 10px 15px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            h2 {
-                font-size: 16px;
-                padding: 8px;
-            }
-            input, select {
-                font-size: 14px;
-                padding: 8px;
-            }
-            .button {
-                font-size: 12px;
-                padding: 8px 12px;
-            }
         }
     </style>
-    <!-- Incluir la librería html2pdf.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
-    <div class="container" id="formulario">
-        <h2>CONSUMO DE EQUIPOS EN SITIOS CLARO</h2>
-        <div class="row">
-            <label>Nombre del Técnico encargado</label>
-            <select id="nombreTecnico">
-                <option value="CARLOS MAURICIO GONZALEZ VILLEGAS">CARLOS MAURICIO GONZALEZ VILLEGAS</option>
-                <option value="ALEXANDER VELAZQUEZ TELLEZ">ALEXANDER VELAZQUEZ TELLEZ</option>
-                <option value="CARLOS ALONSO ARGUELLO SALAS">CARLOS ALONSO ARGUELLO SALAS</option>
-                <option value="DAVID NAVARRO HERRERA">DAVID NAVARRO HERRERA</option>
-                <option value="JOSE DAVID BERMUDEZ FALLAS">JOSE DAVID BERMUDEZ FALLAS</option>
-                <option value="LUIS DIEGO RAMIREZ SOLANO">LUIS DIEGO RAMIREZ SOLANO</option>
-                <option value="FREDDY CHENG NG">FREDDY CHENG NG</option>
-                <option value="BRAULIO CERDAS SALAZAR">BRAULIO CERDAS SALAZAR</option>
-                <option value="BRAIAN ALEXANDER ZAMBRANO RAMIREZ">BRAIAN ALEXANDER ZAMBRANO RAMIREZ</option>
-                <option value="JONATHAN JOSE CHAVES QUIROS">JONATHAN JOSE CHAVES QUIROS</option>
-                <option value="JEFRY ROSALES VILLAREAL">JEFRY ROSALES VILLAREAL</option>
-                <option value="JOSE GREGORIO MELENDEZ LONGA">JOSE GREGORIO MELENDEZ LONGA</option>
-                <option value="LUIS PABLO ARTEAGA GOMEZ">LUIS PABLO ARTEAGA GOMEZ</option>
-                <option value="BRAYNER DAVID VEGA QUESADA">BRAYNER DAVID VEGA QUESADA</option>
-                <option value="KEVIN DANIEL ARIAS GALLARDO">KEVIN DANIEL ARIAS GALLARDO</option>
-                <option value="JOHNNY MAURICIO RODRIGUEZ SEQUEIRA">JOHNNY MAURICIO RODRIGUEZ SEQUEIRA</option>
-                <option value="JORGE ALFONSO CHAVARRIA PICADO">JORGE ALFONSO CHAVARRIA PICADO</option>
-                <option value="MANUEL VALLADARES MEJIA">MANUEL VALLADARES MEJIA</option>
-                <option value="ANGEL ALFREDO VALLECILLO CRUZ">ANGEL ALFREDO VALLECILLO CRUZ</option>
-                <option value="DAYBIS ALEXANDER MENBREÑO BUSTOS">DAYBIS ALEXANDER MENBREÑO BUSTOS</option>
-                <option value="JORAM JESUS MATARRITA ARAYA">JORAM JESUS MATARRITA ARAYA</option>
-                <option value="JUAN CARLOS VILLALOBOS BUSTOS">JUAN CARLOS VILLALOBOS BUSTOS</option>
-                <option value="JORGE ALEJANDRO VEGA MORA">JORGE ALEJANDRO VEGA MORA</option>
-                <option value="LUIS ALEJANDRO CASCANTE SANDI">LUIS ALEJANDRO CASCANTE SANDI</option>
-                <option value="FABIAN GONZALEZ VALLE">FABIAN GONZALEZ VALLE</option>
-                <option value="WILBERT YADIAN RODRIGUEZ UMAÑA">WILBERT YADIAN RODRIGUEZ UMAÑA</option>
-                <option value="BISMARK ORLANDO BRAVO RAMIREZ">BISMARK ORLANDO BRAVO RAMIREZ</option>
-                <option value="JOSE ARTURO VINDAS CASTILLO">JOSE ARTURO VINDAS CASTILLO</option>
-                <option value="NORBERTO ALONSO MOLINA ROJAS">NORBERTO ALONSO MOLINA ROJAS</option>
-                <option value="WAGNER ALBERTO SANDI ROMERO">WAGNER ALBERTO SANDI ROMERO</option>
-                <option value="JEFFRY MARCIAL VILLEGAS LOPEZ">JEFFRY MARCIAL VILLEGAS LOPEZ</option>
-                <option value="GILBERT MAURICIO JIMENEZ PRENDAS">GILBERT MAURICIO JIMENEZ PRENDAS</option>
-            </select>
-        </div>
-
-        <div class="row">
-            <label>Fecha de la colocación del equipo</label>
-            <input type="date" id="fechaColocacion">
-        </div>
-
-        <div class="row">
-            <label>Zona de asignación técnica</label>
-            <select id="zonaAsignacion" class="highlight">
-                <option value="Alajuela">Alajuela</option>
-                <option value="Heredia">Heredia</option>
-                <option value="Cartago">Cartago</option>
-                <option value="Este">Este</option>
-                <option value="Golfo">Golfo</option>
-                <option value="Liberia">Liberia</option>
-                <option value="Limon">Limon</option>
-                <option value="Oeste">Oeste</option>
-                <option value="Pacifico">Pacifico</option>
-                <option value="San Carlos">San Carlos</option>
-                <option value="Sur">Sur</option>
-            </select>
-        </div>
-
-        <div class="row">
-            <label>Sitio</label>
-            <input type="text" id="sitio" value="RUR193">
-        </div>
-
-        <div class="row">
-            <label>Ticket ETA</label>
-            <input type="text" id="ticketETA" value="T1588518">
-        </div>
-
-        <div class="row">
-            <label>Nombre del equipo colocado</label>
-            <input type="text" id="nombreEquipo" class="highlight" value="Radio 4499 B1 B3">
-        </div>
-
-        <div class="row">
-            <label>Cantidad de equipos asignados al sitio</label>
-            <input type="text" id="cantidadEquipos" value="1">
-        </div>
-
-        <div class="row">
-            <label>Código de descripción del equipo</label>
-            <input type="text" id="codigoEquipo" placeholder="Escribe para buscar..." autocomplete="off">
-            <div id="suggestions" class="suggestions"></div>
-        </div>
-    </div>
-
-    <!-- Botón para generar y compartir el PDF -->
-    <div style="text-align: center; margin-top: 20px;">
-        <button class="button" onclick="generarPDF()">GENERAR Y COMPARTIR PDF</button>
-    </div>
+    <h1>Escáner de Códigos</h1>
+    <button id="activar-camara">Activar Cámara</button>
+    <div id="qr-reader"></div>
+    <div id="descripcion">Escanea un código para ver la descripción aquí.</div>
 
     <script>
-        // Función para establecer la fecha actual en el campo de fecha
-        function establecerFechaActual() {
-            const fechaInput = document.getElementById("fechaColocacion");
-            const fechaActual = new Date().toISOString().split("T")[0]; // Formato YYYY-MM-DD
-            fechaInput.value = fechaActual;
-        }
-
-        // Llamar a la función al cargar la página
-        window.onload = establecerFechaActual;
-
-        // Configuración de la API de Google Sheets
-        const SHEET_ID = '1k7gBdZwyHrZ0AJYSudI_lvE702qoYu-1D-tRlCmI5Ws'; // Reemplaza con tu ID
+        const SHEET_ID = '1k7gBdZwyHrZ0AJYSudI_lvE702qoYu-1D-tRlCmI5Ws'; // Reemplaza con tu ID de hoja
         const API_KEY = 'AIzaSyAgm2abFGywtXF3ZXxOEVsiJQZu9DO7_hI'; // Reemplaza con tu clave de API
         const RANGO = 'Equipos!A2:B'; // Ajusta el rango según tu hoja
 
-        // Obtener elementos del DOM
-        const codigoEquipo = document.getElementById("codigoEquipo");
-        const nombreEquipo = document.getElementById("nombreEquipo");
-        const suggestions = document.getElementById("suggestions");
+        let html5QrCode;
 
-        // Función para obtener datos de Google Sheets
         async function obtenerDatosDeSheets() {
             const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGO}?key=${API_KEY}`;
             try {
@@ -279,70 +64,49 @@
             }
         }
 
-        // Función para mostrar sugerencias
-        async function mostrarSugerencias(valor) {
-            suggestions.innerHTML = ""; // Limpiar sugerencias anteriores
-            if (valor.length > 0) {
-                const datos = await obtenerDatosDeSheets();
-                const filtrados = datos.filter(([codigo]) => codigo.toUpperCase().includes(valor.toUpperCase()));
-                filtrados.forEach(([codigo, descripcion]) => {
-                    const div = document.createElement("div");
-                    div.textContent = codigo;
-                    div.onclick = () => {
-                        codigoEquipo.value = codigo;
-                        nombreEquipo.value = descripcion || "";
-                        suggestions.style.display = "none";
-                    };
-                    suggestions.appendChild(div);
-                });
-                suggestions.style.display = "block";
-            } else {
-                suggestions.style.display = "none";
-            }
+        function onScanSuccess(qrMessage) {
+            document.getElementById('descripcion').textContent = `Buscando descripción para: ${qrMessage}`;
+            buscarDescripcion(qrMessage);
         }
 
-        // Evento para filtrar códigos mientras se escribe
-        codigoEquipo.addEventListener("input", function () {
-            mostrarSugerencias(this.value);
-        });
+        function onScanError(error) {
+            console.warn(`Error de escaneo: ${error}`);
+        }
 
-        // Evento para ocultar sugerencias al hacer clic fuera
-        document.addEventListener("click", function (event) {
-            if (event.target !== codigoEquipo) {
-                suggestions.style.display = "none";
+        document.getElementById('activar-camara').addEventListener('click', async () => {
+            // Mostrar el escáner
+            document.getElementById('qr-reader').style.display = 'block';
+
+            // Verificar permisos
+            try {
+                await navigator.mediaDevices.getUserMedia({ video: true });
+                
+                // Iniciar el escaneo solo después de obtener los permisos
+                html5QrCode = new Html5Qrcode("qr-reader");
+                html5QrCode.start(
+                    { facingMode: "environment" },
+                    {
+                        fps: 10,
+                        qrbox: { width: 250, height: 250 },
+                    },
+                    onScanSuccess,
+                    onScanError
+                ).catch(err => {
+                    console.error("No se pudo iniciar el escáner:", err);
+                    document.getElementById('descripcion').textContent = "No se pudo iniciar el escáner. Revisa los permisos de la cámara.";
+                });
+            } catch (error) {
+                console.error("Permisos denegados o error al acceder a la cámara:", error);
+                document.getElementById('descripcion').textContent = "Error: No se pudo acceder a la cámara. Asegúrate de otorgar permisos.";
             }
         });
 
-        // Función para generar y compartir el PDF
-        function generarPDF() {
-            // Obtener el valor del campo "Sitio"
-            const sitio = document.getElementById("sitio").value;
-
-            // Crear el nombre del archivo PDF
-            const nombreArchivo = `Registro para consumo de equipos - ${sitio}.pdf`;
-
-            // Ocultar el botón antes de generar el PDF
-            const boton = document.querySelector('.button');
-            boton.style.display = 'none';
-
-            // Configuración de html2pdf
-            const elemento = document.getElementById('formulario');
-            const opciones = {
-                margin: 10,
-                filename: nombreArchivo, // Nombre personalizado del archivo
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            // Generar el PDF
-            html2pdf().from(elemento).set(opciones).save().then(() => {
-                // Mostrar el botón nuevamente después de generar el PDF
-                boton.style.display = 'inline-block';
-            });
+        async function buscarDescripcion(codigo) {
+            const datos = await obtenerDatosDeSheets();
+            const resultado = datos.find(([codigoHoja]) => codigoHoja === codigo);
+            const descripcion = resultado ? resultado[1] : "Descripción no encontrada";
+            document.getElementById('descripcion').textContent = descripcion;
         }
     </script>
-    <script src="cordova.js"></script>
-    <script src="js/index.js"></script>
 </body>
 </html>
