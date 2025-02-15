@@ -92,7 +92,10 @@
                     coincidencias.forEach(([codigo, descripcionHoja]) => {
                         const item = document.createElement('div');
                         item.textContent = descripcionHoja;
-                        item.onclick = () => mostrarCodigo(codigo);
+                        item.onclick = () => {
+                            mostrarCodigo(codigo);
+                            lista.style.display = 'none';
+                        };
                         lista.appendChild(item);
                     });
                 }
@@ -101,7 +104,6 @@
 
         function mostrarCodigo(codigo) {
             document.getElementById('resultado').textContent = `Código: ${codigo}`;
-            document.getElementById('lista-desplegable').style.display = 'none';
             document.getElementById('descripcion-input').value = '';
         }
 
