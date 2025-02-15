@@ -60,28 +60,35 @@
         const API_KEY = 'AIzaSyAgm2abFGywtXF3ZXxOEVsiJQZu9DO7_hI'; // Tu clave de API
         const RANGO = 'Equipos!A2:B'; // Rango de la hoja
 
+        // Función para obtener datos de Google Sheets
         async function obtenerDatosDeSheets() {
             const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGO}?key=${API_KEY}`;
             try {
                 const response = await fetch(url);
                 const data = await response.json();
-                return data.values || [];
+                if (data.values) {
+                    console.log("Datos obtenidos:", data.values); // Verificar los datos en consola
+                    return data.values;
+                } else {
+                    throw new Error('No se encontraron datos.');
+                }
             } catch (error) {
                 console.error("Error al obtener datos de Google Sheets:", error);
                 return [];
             }
         }
 
+        // Función para mostrar la lista desplegable
         function mostrarListaDesplegable(descripcion) {
             const lista = document.getElementById('lista-desplegable');
-            lista.innerHTML = '';
+            lista.innerHTML = ''; // Limpiar la lista antes de mostrarla
             if (!descripcion) {
                 lista.style.display = 'none';
                 return;
             }
 
             obtenerDatosDeSheets().then(datos => {
-                const coincidencias = datos.filter(([, descripcionHoja]) => 
+                const coincidencias = datos.filter(([, descripcionHoja]) =>
                     descripcionHoja.toLowerCase().includes(descripcion.toLowerCase())
                 );
 
@@ -94,7 +101,7 @@
                         item.textContent = descripcionHoja;
                         item.onclick = () => {
                             mostrarCodigo(codigo);
-                            lista.style.display = 'none';  // Ocultar la lista al seleccionar
+                            lista.style.display = 'none'; // Ocultar lista al seleccionar
                         };
                         lista.appendChild(item);
                     });
@@ -102,18 +109,19 @@
             });
         }
 
+        // Función para mostrar el código al hacer clic
         function mostrarCodigo(codigo) {
             document.getElementById('resultado').textContent = `Código: ${codigo}`;
             document.getElementById('descripcion-input').value = ''; // Limpiar campo de texto
         }
 
-        // Evento para mostrar las descripciones a medida que se escribe
+        // Detectar cuando se escribe en el campo de descripción
         document.getElementById('descripcion-input').addEventListener('input', (e) => {
             const descripcion = e.target.value.trim();
             mostrarListaDesplegable(descripcion);
         });
 
-        // Cerrar lista si se hace clic fuera del campo de texto
+        // Cerrar la lista al hacer clic fuera del campo de texto
         document.addEventListener('click', (e) => {
             if (!document.getElementById('descripcion-input').contains(e.target)) {
                 document.getElementById('lista-desplegable').style.display = 'none';
