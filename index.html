@@ -79,7 +79,7 @@
 
             // Verificar permisos
             try {
-                await navigator.mediaDevices.getUserMedia({ video: true });
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
                 
                 // Iniciar el escaneo solo después de obtener los permisos
                 html5QrCode = new Html5Qrcode("qr-reader");
