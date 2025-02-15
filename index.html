@@ -94,7 +94,7 @@
                         item.textContent = descripcionHoja;
                         item.onclick = () => {
                             mostrarCodigo(codigo);
-                            lista.style.display = 'none';
+                            lista.style.display = 'none';  // Ocultar la lista al seleccionar
                         };
                         lista.appendChild(item);
                     });
@@ -104,12 +104,20 @@
 
         function mostrarCodigo(codigo) {
             document.getElementById('resultado').textContent = `Código: ${codigo}`;
-            document.getElementById('descripcion-input').value = '';
+            document.getElementById('descripcion-input').value = ''; // Limpiar campo de texto
         }
 
+        // Evento para mostrar las descripciones a medida que se escribe
         document.getElementById('descripcion-input').addEventListener('input', (e) => {
             const descripcion = e.target.value.trim();
             mostrarListaDesplegable(descripcion);
+        });
+
+        // Cerrar lista si se hace clic fuera del campo de texto
+        document.addEventListener('click', (e) => {
+            if (!document.getElementById('descripcion-input').contains(e.target)) {
+                document.getElementById('lista-desplegable').style.display = 'none';
+            }
         });
     </script>
 </body>
