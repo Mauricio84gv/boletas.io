@@ -15,16 +15,6 @@
         h1 {
             color: #333;
         }
-        #buscar-descripcion {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
         #descripcion-input {
             padding: 10px;
             font-size: 16px;
@@ -33,36 +23,36 @@
             border: 1px solid #ccc;
             border-radius: 5px;
         }
-        #lista-coincidencias {
-            width: 300px;
-            margin: 10px auto;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            max-height: 150px;
-            overflow-y: auto;
-            text-align: left;
-            display: none;
-        }
-        #lista-coincidencias div {
-            padding: 10px;
-            cursor: pointer;
-        }
-        #lista-coincidencias div:hover {
-            background-color: #f0f0f5;
-        }
         #resultado {
             font-size: 18px;
             font-weight: bold;
             color: #333;
             margin-top: 20px;
         }
+        #lista-desplegable {
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            width: 300px;
+            margin-top: 5px;
+            background-color: white;
+            position: absolute;
+            display: none;
+        }
+        #lista-desplegable div {
+            padding: 8px;
+            cursor: pointer;
+        }
+        #lista-desplegable div:hover {
+            background-color: #007bff;
+            color: white;
+        }
     </style>
 </head>
 <body>
     <h1>Buscar Código por Descripción</h1>
-    <input type="text" id="descripcion-input" placeholder="Ingresa parte de la descripción">
-    <div id="lista-coincidencias"></div>
-    <button id="buscar-descripcion">Buscar</button>
+    <input type="text" id="descripcion-input" placeholder="Ingresa la descripción">
+    <div id="lista-desplegable"></div>
     <div id="resultado">El código aparecerá aquí.</div>
 
     <script>
@@ -70,73 +60,55 @@
         const API_KEY = 'AIzaSyAgm2abFGywtXF3ZXxOEVsiJQZu9DO7_hI'; // Tu clave de API
         const RANGO = 'Equipos!A2:B'; // Rango de la hoja
 
-        let datos = []; // Almacenará los datos de Google Sheets
-        let coincidencias = []; // Almacenará las coincidencias encontradas
-
         async function obtenerDatosDeSheets() {
             const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGO}?key=${API_KEY}`;
             try {
                 const response = await fetch(url);
                 const data = await response.json();
-                datos = data.values || [];
+                return data.values || [];
             } catch (error) {
                 console.error("Error al obtener datos de Google Sheets:", error);
+                return [];
             }
         }
 
-        function buscarCoincidencias(descripcion) {
-            if (!descripcion) {
-                document.getElementById('lista-coincidencias').style.display = 'none';
-                return;
-            }
-
-            coincidencias = datos.filter(([, descripcionHoja]) =>
-                descripcionHoja.toLowerCase().includes(descripcion.toLowerCase())
-            );
-
-            const lista = document.getElementById('lista-coincidencias');
+        function mostrarListaDesplegable(descripcion) {
+            const lista = document.getElementById('lista-desplegable');
             lista.innerHTML = '';
-
-            if (coincidencias.length > 0) {
-                coincidencias.forEach(([, descripcionHoja]) => {
-                    const item = document.createElement('div');
-                    item.textContent = descripcionHoja;
-                    item.addEventListener('click', () => {
-                        document.getElementById('descripcion-input').value = descripcionHoja;
-                        lista.style.display = 'none';
-                    });
-                    lista.appendChild(item);
-                });
-                lista.style.display = 'block';
-            } else {
-                lista.style.display = 'none';
-            }
-        }
-
-        document.getElementById('descripcion-input').addEventListener('input', (event) => {
-            buscarCoincidencias(event.target.value);
-        });
-
-        document.getElementById('buscar-descripcion').addEventListener('click', async () => {
-            const descripcion = document.getElementById('descripcion-input').value.trim();
             if (!descripcion) {
-                document.getElementById('resultado').textContent = "Por favor, ingresa una descripción.";
+                lista.style.display = 'none';
                 return;
             }
 
-            const resultado = coincidencias.find(([, descripcionHoja]) =>
-                descripcionHoja.toLowerCase() === descripcion.toLowerCase()
-            );
+            obtenerDatosDeSheets().then(datos => {
+                const coincidencias = datos.filter(([, descripcionHoja]) => 
+                    descripcionHoja.toLowerCase().includes(descripcion.toLowerCase())
+                );
 
-            if (resultado) {
-                document.getElementById('resultado').textContent = `Código: ${resultado[0]}`;
-            } else {
-                document.getElementById('resultado').textContent = "No se encontró un código para la descripción seleccionada.";
-            }
+                if (coincidencias.length === 0) {
+                    lista.style.display = 'none';
+                } else {
+                    lista.style.display = 'block';
+                    coincidencias.forEach(([codigo, descripcionHoja]) => {
+                        const item = document.createElement('div');
+                        item.textContent = descripcionHoja;
+                        item.onclick = () => mostrarCodigo(codigo);
+                        lista.appendChild(item);
+                    });
+                }
+            });
+        }
+
+        function mostrarCodigo(codigo) {
+            document.getElementById('resultado').textContent = `Código: ${codigo}`;
+            document.getElementById('lista-desplegable').style.display = 'none';
+            document.getElementById('descripcion-input').value = '';
+        }
+
+        document.getElementById('descripcion-input').addEventListener('input', (e) => {
+            const descripcion = e.target.value.trim();
+            mostrarListaDesplegable(descripcion);
         });
-
-        // Cargar los datos al iniciar
-        obtenerDatosDeSheets();
     </script>
 </body>
 </html>
