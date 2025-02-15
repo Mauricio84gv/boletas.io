@@ -46,27 +46,10 @@
     <div id="descripcion">Escanea un código para ver la descripción aquí.</div>
 
     <script>
-        const SHEET_ID = '1k7gBdZwyHrZ0AJYSudI_lvE702qoYu-1D-tRlCmI5Ws'; // Reemplaza con tu ID de hoja
-        const API_KEY = 'AIzaSyAgm2abFGywtXF3ZXxOEVsiJQZu9DO7_hI'; // Reemplaza con tu clave de API
-        const RANGO = 'Equipos!A2:B'; // Ajusta el rango según tu hoja
-
         let html5QrCode;
 
-        async function obtenerDatosDeSheets() {
-            const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGO}?key=${API_KEY}`;
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                return data.values || [];
-            } catch (error) {
-                console.error("Error al obtener datos de Google Sheets:", error);
-                return [];
-            }
-        }
-
         function onScanSuccess(qrMessage) {
-            document.getElementById('descripcion').textContent = `Buscando descripción para: ${qrMessage}`;
-            buscarDescripcion(qrMessage);
+            document.getElementById('descripcion').textContent = `Código escaneado: ${qrMessage}`;
         }
 
         function onScanError(error) {
@@ -103,13 +86,6 @@
                 }
             }
         });
-
-        async function buscarDescripcion(codigo) {
-            const datos = await obtenerDatosDeSheets();
-            const resultado = datos.find(([codigoHoja]) => codigoHoja === codigo);
-            const descripcion = resultado ? resultado[1] : "Descripción no encontrada";
-            document.getElementById('descripcion').textContent = descripcion;
-        }
     </script>
 </body>
 </html>
