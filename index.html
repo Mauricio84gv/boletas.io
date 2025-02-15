@@ -23,6 +23,7 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            margin-top: 10px;
         }
         #descripcion-input {
             padding: 10px;
@@ -31,6 +32,23 @@
             margin-right: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
+        }
+        #lista-coincidencias {
+            width: 300px;
+            margin: 10px auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            max-height: 150px;
+            overflow-y: auto;
+            text-align: left;
+            display: none;
+        }
+        #lista-coincidencias div {
+            padding: 10px;
+            cursor: pointer;
+        }
+        #lista-coincidencias div:hover {
+            background-color: #f0f0f5;
         }
         #resultado {
             font-size: 18px;
@@ -42,32 +60,62 @@
 </head>
 <body>
     <h1>Buscar Código por Descripción</h1>
-    <input type="text" id="descripcion-input" placeholder="Ingresa la descripción">
+    <input type="text" id="descripcion-input" placeholder="Ingresa parte de la descripción">
+    <div id="lista-coincidencias"></div>
     <button id="buscar-descripcion">Buscar</button>
     <div id="resultado">El código aparecerá aquí.</div>
 
     <script>
-        const SHEET_ID = '1k7gBdZwyHrZ0AJYSudI_lvE702qoYu-1D-tRlCmI5Ws'; // Reemplaza con tu ID de hoja
-        const API_KEY = 'AIzaSyAgm2abFGywtXF3ZXxOEVsiJQZu9DO7_hI'; // Reemplaza con tu clave de API
-        const RANGO = 'Equipos!A2:B'; // Ajusta el rango según tu hoja
+        const SHEET_ID = '1k7gBdZwyHrZ0AJYSudI_lvE702qoYu-1D-tRlCmI5Ws'; // Tu ID de hoja
+        const API_KEY = 'AIzaSyAgm2abFGywtXF3ZXxOEVsiJQZu9DO7_hI'; // Tu clave de API
+        const RANGO = 'Equipos!A2:B'; // Rango de la hoja
+
+        let datos = []; // Almacenará los datos de Google Sheets
+        let coincidencias = []; // Almacenará las coincidencias encontradas
 
         async function obtenerDatosDeSheets() {
             const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGO}?key=${API_KEY}`;
             try {
                 const response = await fetch(url);
                 const data = await response.json();
-                return data.values || [];
+                datos = data.values || [];
             } catch (error) {
                 console.error("Error al obtener datos de Google Sheets:", error);
-                return [];
             }
         }
 
-        async function buscarCodigoPorDescripcion(descripcion) {
-            const datos = await obtenerDatosDeSheets();
-            const resultado = datos.find(([, descripcionHoja]) => descripcionHoja.toLowerCase() === descripcion.toLowerCase());
-            return resultado ? resultado[0] : "Código no encontrado";
+        function buscarCoincidencias(descripcion) {
+            if (!descripcion) {
+                document.getElementById('lista-coincidencias').style.display = 'none';
+                return;
+            }
+
+            coincidencias = datos.filter(([, descripcionHoja]) =>
+                descripcionHoja.toLowerCase().includes(descripcion.toLowerCase())
+            );
+
+            const lista = document.getElementById('lista-coincidencias');
+            lista.innerHTML = '';
+
+            if (coincidencias.length > 0) {
+                coincidencias.forEach(([, descripcionHoja]) => {
+                    const item = document.createElement('div');
+                    item.textContent = descripcionHoja;
+                    item.addEventListener('click', () => {
+                        document.getElementById('descripcion-input').value = descripcionHoja;
+                        lista.style.display = 'none';
+                    });
+                    lista.appendChild(item);
+                });
+                lista.style.display = 'block';
+            } else {
+                lista.style.display = 'none';
+            }
         }
+
+        document.getElementById('descripcion-input').addEventListener('input', (event) => {
+            buscarCoincidencias(event.target.value);
+        });
 
         document.getElementById('buscar-descripcion').addEventListener('click', async () => {
             const descripcion = document.getElementById('descripcion-input').value.trim();
@@ -76,10 +124,19 @@
                 return;
             }
 
-            document.getElementById('resultado').textContent = "Buscando...";
-            const codigo = await buscarCodigoPorDescripcion(descripcion);
-            document.getElementById('resultado').textContent = `Código: ${codigo}`;
+            const resultado = coincidencias.find(([, descripcionHoja]) =>
+                descripcionHoja.toLowerCase() === descripcion.toLowerCase()
+            );
+
+            if (resultado) {
+                document.getElementById('resultado').textContent = `Código: ${resultado[0]}`;
+            } else {
+                document.getElementById('resultado').textContent = "No se encontró un código para la descripción seleccionada.";
+            }
         });
+
+        // Cargar los datos al iniciar
+        obtenerDatosDeSheets();
     </script>
 </body>
 </html>
