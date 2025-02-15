@@ -74,16 +74,16 @@
         }
 
         document.getElementById('activar-camara').addEventListener('click', async () => {
-            // Mostrar el escáner
-            document.getElementById('qr-reader').style.display = 'block';
-
-            // Verificar permisos
             try {
+                // Verificar permisos
                 const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
                 
-                // Iniciar el escaneo solo después de obtener los permisos
+                // Mostrar el escáner
+                document.getElementById('qr-reader').style.display = 'block';
+
+                // Iniciar el escaneo
                 html5QrCode = new Html5Qrcode("qr-reader");
-                html5QrCode.start(
+                await html5QrCode.start(
                     { facingMode: "environment" },
                     {
                         fps: 10,
@@ -91,13 +91,16 @@
                     },
                     onScanSuccess,
                     onScanError
-                ).catch(err => {
-                    console.error("No se pudo iniciar el escáner:", err);
-                    document.getElementById('descripcion').textContent = "No se pudo iniciar el escáner. Revisa los permisos de la cámara.";
-                });
+                );
             } catch (error) {
-                console.error("Permisos denegados o error al acceder a la cámara:", error);
-                document.getElementById('descripcion').textContent = "Error: No se pudo acceder a la cámara. Asegúrate de otorgar permisos.";
+                console.error("Error al acceder a la cámara:", error);
+                if (error.name === "NotAllowedError") {
+                    document.getElementById('descripcion').textContent = "Error: Permisos de cámara denegados. Por favor, permite el acceso a la cámara.";
+                } else if (error.name === "NotFoundError") {
+                    document.getElementById('descripcion').textContent = "Error: No se encontró ninguna cámara.";
+                } else {
+                    document.getElementById('descripcion').textContent = "Error: No se pudo acceder a la cámara. Asegúrate de que la cámara esté disponible y los permisos estén otorgados.";
+                }
             }
         });
 
