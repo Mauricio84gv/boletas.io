@@ -1,64 +1,103 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buscar Código por Descripción</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Búsqueda de Descripciones</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f0f0f5;
-            margin: 0;
-            padding: 20px;
-        }
-        h1 {
-            color: #333;
-        }
-        #descripcion-input {
-            padding: 10px;
-            font-size: 16px;
-            width: 300px;
-            margin-right: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        #resultado {
-            font-size: 18px;
-            font-weight: bold;
-            color: #333;
-            margin-top: 20px;
-        }
-        #lista-desplegable {
-            max-height: 150px;
-            overflow-y: auto;
-            border: 1px solid #ccc;
-            width: 300px;
-            margin-top: 5px;
             background-color: white;
-            position: absolute;
-            display: none;
+            text-align: center;
+            margin: 0;
+            padding: 0;
         }
-        #lista-desplegable div {
-            padding: 8px;
-            cursor: pointer;
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 2px solid black;
+            background-color: white;
+            box-sizing: border-box;
         }
-        #lista-desplegable div:hover {
-            background-color: #007bff;
+        h2 {
+            background-color: red;
             color: white;
+            padding: 15px;
+            font-size: 22px;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+            margin: -20px -20px 20px -20px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+            text-align: left;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 2px solid black;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: white;
+            box-sizing: border-box;
+        }
+        .button {
+            background-color: green;
+            color: white;
+            padding: 15px 20px;
+            border: 2px solid black;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .button:hover {
+            background-color: darkgreen;
+        }
+        .resultados {
+            margin-top: 20px;
+            border: 2px solid black;
+            padding: 10px;
+            text-align: left;
+        }
+        .resultados div {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #ccc;
+        }
+        .resultados div:hover {
+            background-color: #f1f1f1;
         }
     </style>
 </head>
 <body>
-    <h1>Buscar Código por Descripción</h1>
-    <input type="text" id="descripcion-input" placeholder="Ingresa la descripción">
-    <div id="lista-desplegable"></div>
-    <div id="resultado">El código aparecerá aquí.</div>
+    <div class="container">
+        <h2>BÚSQUEDA DE DESCRIPCIONES</h2>
+        <div class="row">
+            <label>Buscar por descripción:</label>
+            <input type="text" id="buscarDescripcion" placeholder="Escribe palabras clave...">
+            <button class="button" onclick="buscar()">Buscar</button>
+        </div>
+        <div id="resultados" class="resultados"></div>
+    </div>
 
     <script>
-        const SHEET_ID = '1k7gBdZwyHrZ0AJYSudI_lvE702qoYu-1D-tRlCmI5Ws'; // Tu ID de hoja
-        const API_KEY = 'AIzaSyAgm2abFGywtXF3ZXxOEVsiJQZu9DO7_hI'; // Tu clave de API
-        const RANGO = 'Equipos!A2:B'; // Rango de la hoja
+        // Configuración de la API de Google Sheets
+        const SHEET_ID = '1k7gBdZwyHrZ0AJYSudI_lvE702qoYu-1D-tRlCmI5Ws'; // Reemplaza con tu ID
+        const API_KEY = 'AIzaSyAgm2abFGywtXF3ZXxOEVsiJQZu9DO7_hI'; // Reemplaza con tu clave de API
+        const RANGO = 'Equipos!A2:B'; // Ajusta el rango según tu hoja
+
+        // Obtener elementos del DOM
+        const buscarDescripcion = document.getElementById("buscarDescripcion");
+        const resultados = document.getElementById("resultados");
 
         // Función para obtener datos de Google Sheets
         async function obtenerDatosDeSheets() {
@@ -66,67 +105,41 @@
             try {
                 const response = await fetch(url);
                 const data = await response.json();
-                if (data.values) {
-                    console.log("Datos obtenidos:", data.values); // Verificar los datos en consola
-                    return data.values;
-                } else {
-                    throw new Error('No se encontraron datos.');
-                }
+                return data.values || [];
             } catch (error) {
                 console.error("Error al obtener datos de Google Sheets:", error);
                 return [];
             }
         }
 
-        // Función para mostrar la lista desplegable
-        function mostrarListaDesplegable(descripcion) {
-            const lista = document.getElementById('lista-desplegable');
-            lista.innerHTML = ''; // Limpiar la lista antes de mostrarla
-            if (!descripcion) {
-                lista.style.display = 'none';
-                return;
-            }
+        // Función para buscar coincidencias
+        async function buscar() {
+            const valor = buscarDescripcion.value.trim().toUpperCase();
+            resultados.innerHTML = ""; // Limpiar resultados anteriores
 
-            obtenerDatosDeSheets().then(datos => {
-                const coincidencias = datos.filter(([, descripcionHoja]) =>
-                    descripcionHoja.toLowerCase().includes(descripcion.toLowerCase())
+            if (valor.length > 0) {
+                const datos = await obtenerDatosDeSheets();
+                const filtrados = datos.filter(([codigo, descripcion]) => 
+                    descripcion.toUpperCase().includes(valor)
                 );
 
-                if (coincidencias.length === 0) {
-                    lista.style.display = 'none';
-                } else {
-                    lista.style.display = 'block';
-                    coincidencias.forEach(([codigo, descripcionHoja]) => {
-                        const item = document.createElement('div');
-                        item.textContent = descripcionHoja;
-                        item.onclick = () => {
-                            mostrarCodigo(codigo);
-                            lista.style.display = 'none'; // Ocultar lista al seleccionar
+                if (filtrados.length > 0) {
+                    filtrados.forEach(([codigo, descripcion]) => {
+                        const div = document.createElement("div");
+                        div.textContent = `${codigo} - ${descripcion}`;
+                        div.onclick = () => {
+                            buscarDescripcion.value = descripcion; // Llenar el campo con la descripción seleccionada
+                            resultados.innerHTML = ""; // Limpiar la lista de resultados
                         };
-                        lista.appendChild(item);
+                        resultados.appendChild(div);
                     });
+                } else {
+                    resultados.innerHTML = "<div>No se encontraron coincidencias.</div>";
                 }
-            });
-        }
-
-        // Función para mostrar el código al hacer clic
-        function mostrarCodigo(codigo) {
-            document.getElementById('resultado').textContent = `Código: ${codigo}`;
-            document.getElementById('descripcion-input').value = ''; // Limpiar campo de texto
-        }
-
-        // Detectar cuando se escribe en el campo de descripción
-        document.getElementById('descripcion-input').addEventListener('input', (e) => {
-            const descripcion = e.target.value.trim();
-            mostrarListaDesplegable(descripcion);
-        });
-
-        // Cerrar la lista al hacer clic fuera del campo de texto
-        document.addEventListener('click', (e) => {
-            if (!document.getElementById('descripcion-input').contains(e.target)) {
-                document.getElementById('lista-desplegable').style.display = 'none';
+            } else {
+                resultados.innerHTML = "<div>Por favor, escribe algo para buscar.</div>";
             }
-        });
+        }
     </script>
 </body>
 </html>
