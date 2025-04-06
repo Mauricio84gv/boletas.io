@@ -96,8 +96,7 @@
         <h2>BÚSQUEDA DE DESCRIPCIONES</h2>
         <div class="row">
             <label>Buscar por descripción:</label>
-            <input type="text" id="buscarDescripcion" placeholder="Escribe palabras clave...">
-            <button class="button" onclick="buscar()">Buscar</button>
+            <input type="text" id="buscarDescripcion" placeholder="Escribe palabras clave..." oninput="buscar()">
         </div>
         <div id="resultados" class="resultados"></div>
         <div id="infoDetallada" class="info-detallada"></div>
@@ -139,7 +138,8 @@
                 console.log("Datos filtrados:", datos); // Depuración
 
                 const filtrados = datos.filter(([codigo, descripcion]) => 
-                    descripcion && descripcion.toUpperCase().includes(valor)
+                    (codigo && codigo.toUpperCase().includes(valor)) || 
+                    (descripcion && descripcion.toUpperCase().includes(valor))
                 );
 
                 if (filtrados.length > 0) {
