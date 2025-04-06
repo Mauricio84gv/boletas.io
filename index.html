@@ -21,4 +21,108 @@
             box-sizing: border-box;
         }
         h2 {
-            background-color: ‌‍
+            background-color: red;
+            color: white;
+            padding: 15px;
+            font-size: 22px;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+            margin: -20px -20px 20px -20px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+            text-align: left;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 2px solid black;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: white;
+            box-sizing: border-box;
+        }
+        .button {
+            background-color: green;
+            color: white;
+            padding: 15px 20px;
+            border: 2px solid black;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .button:hover {
+            background-color: darkgreen;
+        }
+        .resultados {
+            margin-top: 20px;
+            border: 2px solid black;
+            padding: 10px;
+            text-align: left;
+        }
+        .resultados div {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #ccc;
+        }
+        .resultados div:hover {
+            background-color: #f1f1f1;
+        }
+        .codigo {
+            font-weight: bold;
+            color: red;
+        }
+        .descripcion {
+            color: black;
+        }
+        .info-detallada {
+            margin-top: 20px;
+            border: 2px solid black;
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>BÚSQUEDA DE DESCRIPCIONES</h2>
+        <div class="row">
+            <label>Buscar por descripción:</label>
+            <input type="text" id="buscarDescripcion" placeholder="Escribe palabras clave...">
+            <button class="button" onclick="buscar()">Buscar</button>
+        </div>
+        <div id="resultados" class="resultados"></div>
+        <div id="infoDetallada" class="info-detallada"></div>
+    </div>
+
+    <script>
+        // Configuración de la API de Google Sheets
+        const SHEET_ID = '1k7gBdZwyHrZ0AJYSudI_lvE702qoYu-1D-tRlCmI5Ws'; // Reemplaza con tu ID
+        const API_KEY = 'AIzaSyAgm2abFGywtXF3ZXxOEVsiJQZu9DO7_hI'; // Reemplaza con tu clave de API
+        const RANGO = 'Equipos!A2:B'; // Ajusta el rango según tu hoja
+
+        // Obtener elementos del DOM
+        const buscarDescripcion = document.getElementById("buscarDescripcion");
+        const resultados = document.getElementById("resultados");
+        const infoDetallada = document.getElementById("infoDetallada");
+
+        // Función para obtener datos de Google Sheets
+        async function obtenerDatosDeSheets() {
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGO}?key=${API_KEY}`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                console.log("Datos obtenidos de Google Sheets:", data); // Depuración
+                return data.values || [];
+            } catch (error) {
+                console.error("Error al obtener datos de Google Sheets:", error);
+                return [];
+    
