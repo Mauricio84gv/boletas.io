@@ -125,4 +125,54 @@
             } catch (error) {
                 console.error("Error al obtener datos de Google Sheets:", error);
                 return [];
-    
+            }
+        }
+
+        // Función para buscar coincidencias
+        async function buscar() {
+            const valor = buscarDescripcion.value.trim().toUpperCase();
+            resultados.innerHTML = ""; // Limpiar resultados anteriores
+            infoDetallada.innerHTML = ""; // Limpiar información detallada
+
+            if (valor.length > 0) {
+                const datos = await obtenerDatosDeSheets();
+                console.log("Datos filtrados:", datos); // Depuración
+
+                const filtrados = datos.filter(([codigo, descripcion]) => 
+                    descripcion && descripcion.toUpperCase().includes(valor)
+                );
+
+                if (filtrados.length > 0) {
+                    filtrados.forEach(([codigo, descripcion]) => {
+                        const div = document.createElement("div");
+                        // Separar código y descripción
+                        div.innerHTML = `
+                            <span class="codigo">${codigo}</span> - 
+                            <span class="descripcion">${descripcion}</span>
+                        `;
+                        div.onclick = () => {
+                            buscarDescripcion.value = descripcion; // Llenar el campo con la descripción seleccionada
+                            resultados.innerHTML = ""; // Limpiar la lista de resultados
+                            mostrarInfoDetallada(codigo, descripcion); // Mostrar información detallada
+                        };
+                        resultados.appendChild(div);
+                    });
+                } else {
+                    resultados.innerHTML = "<div>No se encontraron coincidencias.</div>";
+                }
+            } else {
+                resultados.innerHTML = "<div>Por favor, escribe algo para buscar.</div>";
+            }
+        }
+
+        // Función para mostrar información detallada del código seleccionado
+        function mostrarInfoDetallada(codigo, descripcion) {
+            infoDetallada.innerHTML = `
+                <h3>Información Detallada</h3>
+                <p><strong>Código:</strong> ${codigo}</p>
+                <p><strong>Descripción:</strong> ${descripcion}</p>
+            `;
+        }
+    </script>
+</body>
+</html>
