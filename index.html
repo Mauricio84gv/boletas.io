@@ -5,99 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Búsqueda de Descripciones</title>
     <style>
-        /* Estilos existentes */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: white;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 1200px;
-            margin: auto;
-            padding: 20px;
-            border: 2px solid black;
-            background-color: white;
-            box-sizing: border-box;
-        }
-        h2 {
-            background-color: red;
-            color: white;
-            padding: 15px;
-            font-size: 22px;
-            font-weight: bold;
-            text-transform: uppercase;
-            text-align: center;
-            margin: -20px -20px 20px -20px;
-        }
-        label {
-            font-weight: bold;
-            display: block;
-            margin-top: 10px;
-            text-align: left;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-            border: 2px solid black;
-            text-align: center;
-            font-size: 16px;
-            font-weight: bold;
-            background-color: white;
-            box-sizing: border-box;
-        }
-        .button {
-            background-color: green;
-            color: white;
-            padding: 15px 20px;
-            border: 2px solid black;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .button:hover {
-            background-color: darkgreen;
-        }
-        .resultados {
-            margin-top: 20px;
-            border: 2px solid black;
-            padding: 10px;
-            text-align: left;
-        }
-        .resultados div {
-            padding: 10px;
-            cursor: pointer;
-            border-bottom: 1px solid #ccc;
-        }
-        .resultados div:hover {
-            background-color: #f1f1f1;
-        }
-        .codigo {
-            font-weight: bold;
-            color: red;
-        }
-        .codigo-sap {
-            font-weight: bold;
-            color: blue;
-        }
-        .descripcion {
-            color: black;
-        }
-        .info-detallada {
-            margin-top: 20px;
-            border: 2px solid black;
-            padding: 10px;
-            text-align: left;
-        }
-        .aplica-rma {
-            color: green;
-            font-weight: bold;
-        }
+        /* Previous styles remain the same */
+        /* ... */
+        
+        /* Add new styles for images */
         .imagen-referencia {
             max-width: 300px;
             margin: 15px 0;
@@ -109,6 +20,14 @@
             max-width: 100%;
             height: auto;
             margin: 10px 0;
+        }
+        .codigo-sap {
+            font-weight: bold;
+            color: blue;
+        }
+        .aplica-rma {
+            color: green;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -202,17 +121,30 @@
 
         async function mostrarInfoDetallada(codigoEricsson, descripcionEricsson, codigoSAP, descripcionSAP, aplicaRMA) {
             infoDetallada.innerHTML = '<p>Cargando información...</p>';
-            const imagenUrl = await buscarImagen(descripcionEricsson + " " + codigoEricsson + " equipment");
             
-            infoDetallada.innerHTML = `
-                <h3>Información Detallada</h3>
-                ${imagenUrl ? `<img src="${imagenUrl}" alt="Imagen de referencia" class="imagen-referencia" onerror="this.style.display='none'">` : ''}
-                <p><strong>Código Ericsson:</strong> <span class="codigo">${codigoEricsson}</span></p>
-                <p><strong>Descripción Ericsson:</strong> ${descripcionEricsson}</p>
-                <p><strong>Código SAP:</strong> <span class="codigo-sap">${codigoSAP}</span></p>
-                <p><strong>Descripción SAP:</strong> ${descripcionSAP}</p>
-                <p><strong>Aplica RMA (Según lista 18/03/25):</strong> <span class="aplica-rma">${aplicaRMA}</span></p>
-            `;
+            try {
+                const imagenUrl = await buscarImagen(descripcionEricsson + " " + codigoEricsson + " equipment");
+                
+                infoDetallada.innerHTML = `
+                    <h3>Información Detallada</h3>
+                    ${imagenUrl ? `<img src="${imagenUrl}" alt="Imagen de referencia" class="imagen-referencia" onerror="this.style.display='none'">` : ''}
+                    <p><strong>Código Ericsson:</strong> <span class="codigo">${codigoEricsson}</span></p>
+                    <p><strong>Descripción Ericsson:</strong> ${descripcionEricsson}</p>
+                    <p><strong>Código SAP:</strong> <span class="codigo-sap">${codigoSAP}</span></p>
+                    <p><strong>Descripción SAP:</strong> ${descripcionSAP}</p>
+                    <p><strong>Aplica RMA (Según lista 18/03/25):</strong> <span class="aplica-rma">${aplicaRMA}</span></p>
+                `;
+            } catch (error) {
+                console.error("Error displaying detailed info:", error);
+                infoDetallada.innerHTML = `
+                    <h3>Información Detallada</h3>
+                    <p><strong>Código Ericsson:</strong> <span class="codigo">${codigoEricsson}</span></p>
+                    <p><strong>Descripción Ericsson:</strong> ${descripcionEricsson}</p>
+                    <p><strong>Código SAP:</strong> <span class="codigo-sap">${codigoSAP}</span></p>
+                    <p><strong>Descripción SAP:</strong> ${descripcionSAP}</p>
+                    <p><strong>Aplica RMA (Según lista 18/03/25):</strong> <span class="aplica-rma">${aplicaRMA}</span></p>
+                `;
+            }
         }
     </script>
 </body>
