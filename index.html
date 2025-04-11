@@ -125,7 +125,7 @@
     <script>
         const SHEET_ID = '1k7gBdZwyHrZ0AJYSudI_lvE702qoYu-1D-tRlCmI5Ws';
         const API_KEY = 'AIzaSyAgm2abFGywtXF3ZXxOEVsiJQZu9DO7_hI';
-        const GOOGLE_CX = '820c293ea39a546aa';
+        const UNSPLASH_ACCESS_KEY = 'pWOFoBEIZr9Yf5V-Nf-LT_0pSQgLkRKK-cM4_NQIwNA';
         const RANGO = 'Equipos!A2:E';
 
         const buscarDescripcion = document.getElementById("buscarDescripcion");
@@ -145,11 +145,15 @@
         }
 
         async function buscarImagen(query) {
-            const url = `https://www.googleapis.com/customsearch/v1?key=${API_KEY}&cx=${GOOGLE_CX}&q=${encodeURIComponent(query)}&searchType=image&num=1`;
+            const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=1`;
             try {
-                const response = await fetch(url);
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Client-ID ${UNSPLASH_ACCESS_KEY}`
+                    }
+                });
                 const data = await response.json();
-                return data.items && data.items.length > 0 ? data.items[0].link : null;
+                return data.results && data.results.length > 0 ? data.results[0].urls.regular : null;
             } catch (error) {
                 console.error("Error al buscar imagen:", error);
                 return null;
@@ -204,18 +208,20 @@
                 <p><strong>Aplica RMA (Según lista 18/03/25):</strong> <span class="aplica-rma">${aplicaRMA}</span></p>
                 <div class="imagen-container">
                     <p><strong>Imagen de referencia:</strong></p>
-                    <div id="imagenProducto"></div>
+                    <div id="imagenProducto"><p>Buscando imagen...</p></div>
                 </div>
             `;
 
-            // Buscar y mostrar la imagen
-            const imagenUrl = await buscarImagen(descripcionEricsson + " " + codigoEricsson);
+            const imagenUrl = await buscarImagen(descripcionEricsson);
             if (imagenUrl) {
                 const imgElement = document.createElement('img');
                 imgElement.src = imagenUrl;
                 imgElement.className = 'producto-imagen';
                 imgElement.alt = descripcionEricsson;
+                document.getElementById('imagenProducto').innerHTML = '';
                 document.getElementById('imagenProducto').appendChild(imgElement);
+            } else {
+                document.getElementById('imagenProducto').innerHTML = '<p>No se encontró imagen</p>';
             }
         }
     </script>
