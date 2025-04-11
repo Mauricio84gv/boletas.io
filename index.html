@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Búsqueda de Descripciones</title>
     <style>
+        /* Estilos existentes */
         body {
             font-family: Arial, sans-serif;
             background-color: white;
@@ -125,7 +126,7 @@
     <script>
         const SHEET_ID = '1k7gBdZwyHrZ0AJYSudI_lvE702qoYu-1D-tRlCmI5Ws';
         const API_KEY = 'AIzaSyAgm2abFGywtXF3ZXxOEVsiJQZu9DO7_hI';
-        const SEARCH_ENGINE_ID = '485f1c0c2c2c24a3f';
+        const SEARCH_ENGINE_ID = '3c0e7f0c05c124a3f';
         const GOOGLE_API_KEY = 'AIzaSyAgm2abFGywtXF3ZXxOEVsiJQZu9DO7_hI';
         const RANGO = 'Equipos!A2:E';
 
@@ -146,10 +147,14 @@
         }
 
         async function buscarImagen(query) {
-            const url = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${SEARCH_ENGINE_ID}&q=${encodeURIComponent(query)}&searchType=image`;
+            const url = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${SEARCH_ENGINE_ID}&q=${encodeURIComponent(query)}&searchType=image&num=1`;
             try {
                 const response = await fetch(url);
                 const data = await response.json();
+                if (data.error) {
+                    console.error("Error en la búsqueda de imagen:", data.error);
+                    return null;
+                }
                 return data.items?.[0]?.link || null;
             } catch (error) {
                 console.error("Error buscando imagen:", error);
@@ -196,11 +201,12 @@
         }
 
         async function mostrarInfoDetallada(codigoEricsson, descripcionEricsson, codigoSAP, descripcionSAP, aplicaRMA) {
-            const imagenUrl = await buscarImagen(descripcionEricsson + " " + codigoEricsson);
+            infoDetallada.innerHTML = '<p>Cargando información...</p>';
+            const imagenUrl = await buscarImagen(descripcionEricsson + " " + codigoEricsson + " equipment");
             
             infoDetallada.innerHTML = `
                 <h3>Información Detallada</h3>
-                ${imagenUrl ? `<img src="${imagenUrl}" alt="Imagen de referencia" class="imagen-referencia">` : ''}
+                ${imagenUrl ? `<img src="${imagenUrl}" alt="Imagen de referencia" class="imagen-referencia" onerror="this.style.display='none'">` : ''}
                 <p><strong>Código Ericsson:</strong> <span class="codigo">${codigoEricsson}</span></p>
                 <p><strong>Descripción Ericsson:</strong> ${descripcionEricsson}</p>
                 <p><strong>Código SAP:</strong> <span class="codigo-sap">${codigoSAP}</span></p>
