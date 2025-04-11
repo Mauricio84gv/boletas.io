@@ -97,6 +97,18 @@
             color: green;
             font-weight: bold;
         }
+        .producto-imagen {
+            max-width: 300px;
+            max-height: 300px;
+            margin: 15px auto;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            display: block;
+        }
+        .imagen-container {
+            text-align: center;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -113,6 +125,7 @@
     <script>
         const SHEET_ID = '1k7gBdZwyHrZ0AJYSudI_lvE702qoYu-1D-tRlCmI5Ws';
         const API_KEY = 'AIzaSyAgm2abFGywtXF3ZXxOEVsiJQZu9DO7_hI';
+        const GOOGLE_CX = '820c293ea39a546aa';
         const RANGO = 'Equipos!A2:E';
 
         const buscarDescripcion = document.getElementById("buscarDescripcion");
@@ -128,6 +141,18 @@
             } catch (error) {
                 console.error("Error al obtener datos de Google Sheets:", error);
                 return [];
+            }
+        }
+
+        async function buscarImagen(query) {
+            const url = `https://www.googleapis.com/customsearch/v1?key=${API_KEY}&cx=${GOOGLE_CX}&q=${encodeURIComponent(query)}&searchType=image&num=1`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                return data.items && data.items.length > 0 ? data.items[0].link : null;
+            } catch (error) {
+                console.error("Error al buscar imagen:", error);
+                return null;
             }
         }
 
@@ -169,7 +194,7 @@
             }
         }
 
-        function mostrarInfoDetallada(codigoEricsson, descripcionEricsson, codigoSAP, descripcionSAP, aplicaRMA) {
+        async function mostrarInfoDetallada(codigoEricsson, descripcionEricsson, codigoSAP, descripcionSAP, aplicaRMA) {
             infoDetallada.innerHTML = `
                 <h3>Información Detallada</h3>
                 <p><strong>Código Ericsson:</strong> <span class="codigo">${codigoEricsson}</span></p>
@@ -177,7 +202,21 @@
                 <p><strong>Código SAP:</strong> <span class="codigo-sap">${codigoSAP}</span></p>
                 <p><strong>Descripción SAP:</strong> ${descripcionSAP}</p>
                 <p><strong>Aplica RMA (Según lista 18/03/25):</strong> <span class="aplica-rma">${aplicaRMA}</span></p>
+                <div class="imagen-container">
+                    <p><strong>Imagen de referencia:</strong></p>
+                    <div id="imagenProducto"></div>
+                </div>
             `;
+
+            // Buscar y mostrar la imagen
+            const imagenUrl = await buscarImagen(descripcionEricsson + " " + codigoEricsson);
+            if (imagenUrl) {
+                const imgElement = document.createElement('img');
+                imgElement.src = imagenUrl;
+                imgElement.className = 'producto-imagen';
+                imgElement.alt = descripcionEricsson;
+                document.getElementById('imagenProducto').appendChild(imgElement);
+            }
         }
     </script>
 </body>
