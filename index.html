@@ -1,161 +1,41 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Búsqueda de Descripciones</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: white;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 600px;
-            margin: auto;
-            padding: 20px;
-            border: 2px solid black;
-            background-color: white;
-            box-sizing: border-box;
-        }
-        h2 {
-            background-color: red;
-            color: white;
-            padding: 15px;
-            font-size: 22px;
-            font-weight: bold;
-            text-transform: uppercase;
-            text-align: center;
-            margin: -20px -20px 20px -20px;
-        }
-        label {
-            font-weight: bold;
-            display: block;
-            margin-top: 10px;
-            text-align: left;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-            border: 2px solid black;
-            text-align: center;
-            font-size: 16px;
-            font-weight: bold;
-            background-color: white;
-            box-sizing: border-box;
-        }
-        .button {
-            background-color: green;
-            color: white;
-            padding: 15px 20px;
-            border: 2px solid black;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .button:hover {
-            background-color: darkgreen;
-        }
-        .resultados {
-            margin-top: 20px;
-            border: 2px solid black;
-            padding: 10px;
-            text-align: left;
-        }
-        .resultados div {
-            padding: 10px;
-            cursor: pointer;
-            border-bottom: 1px solid #ccc;
-        }
-        .resultados div:hover {
-            background-color: #f1f1f1;
-        }
-        .codigo {
-            font-weight: bold;
-            color: red;
-        }
-        .descripcion {
-            color: black;
-        }
-        .info-detallada {
-            margin-top: 20px;
-            border: 2px solid black;
-            padding: 10px;
-            text-align: left;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>BÚSQUEDA DE DESCRIPCIONES</h2>
-        <div class="row">
-            <label>Buscar por descripción:</label>
-            <input type="text" id="buscarDescripcion" placeholder="Escribe palabras clave..." oninput="buscar()">
-        </div>
-        <div id="resultados" class="resultados"></div>
-        <div id="infoDetallada" class="info-detallada"></div>
-    </div>
-
     <script>
         // Configuración de la API de Google Sheets
-        const SHEET_ID = '1k7gBdZwyHrZ0AJYSudI_lvE702qoYu-1D-tRlCmI5Ws'; // Reemplaza con tu ID
-        const API_KEY = 'AIzaSyAgm2abFGywtXF3ZXxOEVsiJQZu9DO7_hI'; // Reemplaza con tu clave de API
-        const RANGO = 'Equipos!A2:C'; // Ajusta el rango para incluir la columna C
+        const SHEET_ID = '1k7gBdZwyHrZ0AJYSudI_lvE702qoYu-1D-tRlCmI5Ws';
+        const API_KEY = 'AIzaSyAgm2abFGywtXF3ZXxOEVsiJQZu9DO7_hI';
+        const RANGO = 'Equipos!A2:E'; // Modificado para incluir 5 columnas
 
-        // Obtener elementos del DOM
-        const buscarDescripcion = document.getElementById("buscarDescripcion");
-        const resultados = document.getElementById("resultados");
-        const infoDetallada = document.getElementById("infoDetallada");
+        // ... resto del código ...
 
-        // Función para obtener datos de Google Sheets
-        async function obtenerDatosDeSheets() {
-            const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGO}?key=${API_KEY}`;
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                console.log("Datos obtenidos de Google Sheets:", data); // Depuración
-                return data.values || [];
-            } catch (error) {
-                console.error("Error al obtener datos de Google Sheets:", error);
-                return [];
-            }
-        }
-
-        // Función para buscar coincidencias
         async function buscar() {
             const valor = buscarDescripcion.value.trim().toUpperCase();
-            resultados.innerHTML = ""; // Limpiar resultados anteriores
-            infoDetallada.innerHTML = ""; // Limpiar información detallada
+            resultados.innerHTML = "";
+            infoDetallada.innerHTML = "";
 
             if (valor.length > 0) {
                 const datos = await obtenerDatosDeSheets();
-                console.log("Datos filtrados:", datos); // Depuración
-
-                const filtrados = datos.filter(([codigo, descripcion, columnaC]) => 
-                    (codigo && codigo.toUpperCase().includes(valor)) || 
-                    (descripcion && descripcion.toUpperCase().includes(valor)) ||
-                    (columnaC && columnaC.toUpperCase().includes(valor))
+                
+                const filtrados = datos.filter(([codigoEricsson, descripcionEricsson, codigoSAP, descripcionSAP, aplicaRMA]) => 
+                    (codigoEricsson && codigoEricsson.toUpperCase().includes(valor)) || 
+                    (descripcionEricsson && descripcionEricsson.toUpperCase().includes(valor)) ||
+                    (codigoSAP && codigoSAP.toUpperCase().includes(valor)) ||
+                    (descripcionSAP && descripcionSAP.toUpperCase().includes(valor)) ||
+                    (aplicaRMA && aplicaRMA.toUpperCase().includes(valor))
                 );
 
                 if (filtrados.length > 0) {
-                    filtrados.forEach(([codigo, descripcion, columnaC]) => {
+                    filtrados.forEach(([codigoEricsson, descripcionEricsson, codigoSAP, descripcionSAP, aplicaRMA]) => {
                         const div = document.createElement("div");
-                        // Separar código, descripción y columna C
                         div.innerHTML = `
-                            <span class="codigo">${codigo}</span> - 
-                            <span class="descripcion">${descripcion}</span> - 
-                            <span class="infoC">${columnaC}</span>
+                            <span class="codigo">${codigoEricsson}</span> - 
+                            <span class="descripcion">${descripcionEricsson}</span> - 
+                            <span class="codigo">${codigoSAP}</span> - 
+                            <span class="descripcion">${descripcionSAP}</span> - 
+                            <span class="infoC">${aplicaRMA}</span>
                         `;
                         div.onclick = () => {
-                            buscarDescripcion.value = descripcion; // Llenar el campo con la descripción seleccionada
-                            resultados.innerHTML = ""; // Limpiar la lista de resultados
-                            mostrarInfoDetallada(codigo, descripcion, columnaC); // Mostrar información detallada
+                            buscarDescripcion.value = descripcionEricsson;
+                            resultados.innerHTML = "";
+                            mostrarInfoDetallada(codigoEricsson, descripcionEricsson, codigoSAP, descripcionSAP, aplicaRMA);
                         };
                         resultados.appendChild(div);
                     });
@@ -167,15 +47,14 @@
             }
         }
 
-        // Función para mostrar información detallada del código seleccionado
-        function mostrarInfoDetallada(codigo, descripcion, columnaC) {
+        function mostrarInfoDetallada(codigoEricsson, descripcionEricsson, codigoSAP, descripcionSAP, aplicaRMA) {
             infoDetallada.innerHTML = `
                 <h3>Información Detallada</h3>
-                <p><strong>Código:</strong> ${codigo}</p>
-                <p><strong>Descripción:</strong> ${descripcion}</p>
-                <p><strong>Aplica RMA (Segun lista 18/03/25):</strong> ${columnaC}</p>
+                <p><strong>Código Ericsson:</strong> ${codigoEricsson}</p>
+                <p><strong>Descripción Ericsson:</strong> ${descripcionEricsson}</p>
+                <p><strong>Código SAP:</strong> ${codigoSAP}</p>
+                <p><strong>Descripción SAP:</strong> ${descripcionSAP}</p>
+                <p><strong>Aplica RMA (Según lista 18/03/25):</strong> ${aplicaRMA}</p>
             `;
         }
     </script>
-</body>
-</html>
