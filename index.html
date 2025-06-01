@@ -121,6 +121,28 @@
             font-size: 0.9em;
             color: #666;
         }
+        .button-edit {
+            background-color: #007bff;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .button-save {
+            background-color: green;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .edit-form {
+            margin-top: 10px;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -205,7 +227,15 @@
                 <p><strong>Código SAP:</strong> <span class="codigo-sap">${codigoSAP}</span></p>
                 <p><strong>Descripción SAP:</strong> ${descripcionSAP}</p>
                 <p><strong>Aplica RMA (Según lista 18/03/25):</strong> <span class="aplica-rma">${aplicaRMA}</span></p>
-                <p><strong>Cantidad en Inventario:</strong> <span class="${estadoInventario}">${cantidadInventario} unidades</span></p>
+                <p>
+                    <strong>Cantidad en Inventario:</strong> 
+                    <span class="${estadoInventario}" id="stockSpan">${cantidadInventario} unidades</span>
+                    <button onclick="editarInventario('${codigoEricsson}', '${cantidadInventario}')" class="button-edit">Editar Stock</button>
+                </p>
+                <div id="formInventario" class="edit-form">
+                    <input type="number" id="nuevoStock" min="0" value="${cantidadInventario}">
+                    <button onclick="guardarInventario('${codigoEricsson}')" class="button-save">Guardar</button>
+                </div>
                 <hr>
                 <div class="developer-info">
                     <h4>Desarrollador:</h4>
@@ -214,6 +244,25 @@
                     <p>Email corporativo: carlos.gonzalezv@claro.cr</p>
                 </div>
             `;
+        }
+
+        function editarInventario(codigo, cantidad) {
+            document.getElementById('formInventario').style.display = 'block';
+            document.getElementById('nuevoStock').value = cantidad;
+        }
+
+        async function guardarInventario(codigo) {
+            const nuevoStock = document.getElementById('nuevoStock').value;
+            
+            // Actualizar la vista localmente
+            document.getElementById('stockSpan').textContent = `${nuevoStock} unidades`;
+            document.getElementById('formInventario').style.display = 'none';
+            
+            // Aquí deberías implementar la lógica para actualizar Google Sheets
+            alert('Inventario actualizado localmente. Para guardar en Google Sheets necesitas implementar un backend.');
+            
+            // Opcional: Recargar los datos
+            buscar();
         }
     </script>
 </body>
