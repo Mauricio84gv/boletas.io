@@ -108,6 +108,19 @@
             color: #333;
             margin-top: 0;
         }
+        .text-success {
+            color: green;
+            font-weight: bold;
+        }
+        .text-danger {
+            color: red;
+            font-weight: bold;
+        }
+        .inventario {
+            margin-left: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -124,7 +137,7 @@
     <script>
         const SHEET_ID = '1k7gBdZwyHrZ0AJYSudI_lvE702qoYu-1D-tRlCmI5Ws';
         const API_KEY = 'AIzaSyAgm2abFGywtXF3ZXxOEVsiJQZu9DO7_hI';
-        const RANGO = 'Equipos!A2:E';
+        const RANGO = 'Equipos!A2:F';
 
         const buscarDescripcion = document.getElementById("buscarDescripcion");
         const resultados = document.getElementById("resultados");
@@ -150,7 +163,7 @@
             if (valor.length > 0) {
                 const datos = await obtenerDatosDeSheets();
                 
-                const filtrados = datos.filter(([codigoEricsson, descripcionEricsson, codigoSAP, descripcionSAP, aplicaRMA]) => 
+                const filtrados = datos.filter(([codigoEricsson, descripcionEricsson, codigoSAP, descripcionSAP, aplicaRMA, inventario]) => 
                     (codigoEricsson && codigoEricsson.toUpperCase().includes(valor)) || 
                     (descripcionEricsson && descripcionEricsson.toUpperCase().includes(valor)) ||
                     (codigoSAP && codigoSAP.toUpperCase().includes(valor)) ||
@@ -159,16 +172,17 @@
                 );
 
                 if (filtrados.length > 0) {
-                    filtrados.forEach(([codigoEricsson, descripcionEricsson, codigoSAP, descripcionSAP, aplicaRMA]) => {
+                    filtrados.forEach(([codigoEricsson, descripcionEricsson, codigoSAP, descripcionSAP, aplicaRMA, inventario]) => {
                         const div = document.createElement("div");
                         div.innerHTML = `
                             <span class="codigo">${codigoEricsson}</span> - 
                             <span class="descripcion">${descripcionEricsson}</span>
+                            <span class="inventario">(Stock: ${inventario || '0'})</span>
                         `;
                         div.onclick = () => {
                             buscarDescripcion.value = descripcionEricsson;
                             resultados.innerHTML = "";
-                            mostrarInfoDetallada(codigoEricsson, descripcionEricsson, codigoSAP, descripcionSAP, aplicaRMA);
+                            mostrarInfoDetallada(codigoEricsson, descripcionEricsson, codigoSAP, descripcionSAP, aplicaRMA, inventario);
                         };
                         resultados.appendChild(div);
                     });
@@ -180,7 +194,10 @@
             }
         }
 
-        function mostrarInfoDetallada(codigoEricsson, descripcionEricsson, codigoSAP, descripcionSAP, aplicaRMA) {
+        function mostrarInfoDetallada(codigoEricsson, descripcionEricsson, codigoSAP, descripcionSAP, aplicaRMA, inventario) {
+            const cantidadInventario = inventario || '0';
+            const estadoInventario = parseInt(cantidadInventario) > 0 ? 'text-success' : 'text-danger';
+            
             infoDetallada.innerHTML = `
                 <h3>Información Detallada</h3>
                 <p><strong>Código Ericsson:</strong> <span class="codigo">${codigoEricsson}</span></p>
@@ -188,6 +205,7 @@
                 <p><strong>Código SAP:</strong> <span class="codigo-sap">${codigoSAP}</span></p>
                 <p><strong>Descripción SAP:</strong> ${descripcionSAP}</p>
                 <p><strong>Aplica RMA (Según lista 18/03/25):</strong> <span class="aplica-rma">${aplicaRMA}</span></p>
+                <p><strong>Cantidad en Inventario:</strong> <span class="${estadoInventario}">${cantidadInventario} unidades</span></p>
                 <hr>
                 <div class="developer-info">
                     <h4>Desarrollador:</h4>
